@@ -35,7 +35,7 @@ while True:
   genomes.sort(key=lambda x: x.fitness, reverse=True)
 
   print('===== Generaton #%s\tBest Fitness %s =====' % (n_gen, genomes[0].fitness))
-  print(genomes[0].w1, genomes[0].w2)
+  # print(genomes[0].w1, genomes[0].w2)
 
   best_genomes = deepcopy(genomes[:N_BEST])
 
