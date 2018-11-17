@@ -13,7 +13,8 @@ DIRECTIONS = [
 class Snake():
   snake, fruit = None, None
 
-  def __init__(self):
+  def __init__(self, s):
+    self.s = s
     self.score = 0
     self.snake = [(15, 2), (15, 1), (15, 0)]
     self.place_fruit()
@@ -71,13 +72,8 @@ class Snake():
     direction = 0 # UP
     prev_key = pygame.K_UP
 
-    pygame.init()
-    pygame.font.init()
-    print(pygame.font.get_fonts())
     font = pygame.font.Font('/Users/brad/Library/Fonts/3270Medium.otf', 20)
     font.set_bold(True)
-    s = pygame.display.set_mode((SCREEN_SIZE * 10, SCREEN_SIZE * 10))
-    pygame.display.set_caption('Snake')
     appleimage = pygame.Surface((10, 10))
     appleimage.fill((0, 255, 0))
     img = pygame.Surface((10, 10))
@@ -122,19 +118,26 @@ class Snake():
             prev_key = e.key
 
       if not self.step(direction):
-        pygame.quit()
-        return self.score
+        break
 
-      s.fill((0, 0, 0))
+      self.s.fill((0, 0, 0))
       for bit in self.snake:
-        s.blit(img, (bit[0] * 10, (SCREEN_SIZE - bit[1] - 1) * 10))
-      s.blit(appleimage, (self.fruit[0] * 10, (SCREEN_SIZE - self.fruit[1]-1) * 10))
+        self.s.blit(img, (bit[0] * 10, (SCREEN_SIZE - bit[1] - 1) * 10))
+      self.s.blit(appleimage, (self.fruit[0] * 10, (SCREEN_SIZE - self.fruit[1]-1) * 10))
       score_ts = font.render(str(self.score), False, (255, 255, 255))
-      s.blit(score_ts, (5, 5))
+      self.s.blit(score_ts, (5, 5))
       pygame.display.update()
 
-while True:
-  snake = Snake()
-  score = snake.run()
+    return self.score
 
-  print('Best Score: %s' % score)
+if __name__ == '__main__':
+  pygame.init()
+  pygame.font.init()
+  s = pygame.display.set_mode((SCREEN_SIZE * 10, SCREEN_SIZE * 10))
+  pygame.display.set_caption('Snake')
+
+  while True:
+    snake = Snake(s)
+    score = snake.run()
+
+    print('Best Score: %s' % score)
