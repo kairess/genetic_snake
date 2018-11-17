@@ -1,15 +1,16 @@
 import pygame
 import os, random
+import numpy as np
 
 SCREEN_SIZE = 30
 PIXEL_SIZE = 10
 
-DIRECTIONS = [
+DIRECTIONS = np.array([
   (0, 1), # UP
   (1, 0), # RIGHT
   (0, -1), # DOWN
   (-1, 0) # LEFT
-]
+])
 
 class Snake():
   snake, fruit = None, None
@@ -17,43 +18,49 @@ class Snake():
   def __init__(self, s):
     self.s = s
     self.score = 0
-    self.snake = [(15, 2), (15, 1), (15, 0)]
+    self.snake = np.array([(15, 2), (15, 1), (15, 0)])
     self.place_fruit()
+
+    # fitness
+    self.fitness = 0.
+    self.last_dist = np.inf
 
   def place_fruit(self, coord=None):
     if coord:
-      self.fruit = coord
+      self.fruit = np.array(coord)
       return
 
     while True:
       x = random.randint(0, SCREEN_SIZE-1)
       y = random.randint(0, SCREEN_SIZE-1)
-      if (x, y) not in self.snake:
-        self.fruit = x, y
-        return
+      if (x, y) not in self.snake.tolist():
+        break
+    self.fruit = np.array([x, y])
 
   def step(self, direction):
     old_head = self.snake[0]
     movement = DIRECTIONS[direction]
-    new_head = (old_head[0] + movement[0], old_head[1] + movement[1])
+    new_head = old_head + movement
 
     if (
         new_head[0] < 0 or
         new_head[0] >= SCREEN_SIZE or
         new_head[1] < 0 or
         new_head[1] >= SCREEN_SIZE or
-        new_head in self.snake
+        new_head.tolist() in self.snake.tolist()
       ):
       return False
-      
-    if new_head == self.fruit:
+    
+    # eat fruit
+    if all(new_head == self.fruit):
       self.score += 1
+      self.fitness += 10
       self.place_fruit()
     else:
       tail = self.snake[-1]
-      del self.snake[-1]
+      self.snake = self.snake[:-1, :]
 
-    self.snake.insert(0, new_head)
+    self.snake = np.concatenate([[new_head], self.snake], axis=0)
     return True
 
   def get_inputs(self):
@@ -120,6 +127,14 @@ class Snake():
 
       if not self.step(direction):
         break
+
+      # compute fitness
+      current_dist = np.linalg.norm(self.snake[0] - self.fruit)
+      if self.last_dist > current_dist:
+        self.fitness += 1.
+      else:
+        self.fitness -= 1.5
+      self.last_dist = current_dist
 
       self.s.fill((0, 0, 0))
       for bit in self.snake:
