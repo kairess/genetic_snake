@@ -4,21 +4,25 @@ import numpy as np
 
 SCREEN_SIZE = 30
 PIXEL_SIZE = 10
+LINE_WIDTH = 1
 
 DIRECTIONS = np.array([
-  (0, 1), # UP
+  (0, -1), # UP
   (1, 0), # RIGHT
-  (0, -1), # DOWN
+  (0, 1), # DOWN
   (-1, 0) # LEFT
 ])
 
 class Snake():
   snake, fruit = None, None
 
-  def __init__(self, s):
+  def __init__(self, s, genome):
+    self.genome = genome
+
     self.s = s
     self.score = 0
-    self.snake = np.array([(15, 2), (15, 1), (15, 0)])
+    self.snake = np.array([(15, 27), (15, 28), (15, 29)])
+    self.direction = 0 # UP
     self.place_fruit()
 
     # fitness
@@ -64,20 +68,41 @@ class Snake():
     return True
 
   def get_inputs(self):
-    result = []
-    for y in range(SCREEN_SIZE-1, -1, -1):
-      for x in range(SCREEN_SIZE):
-        out = 0
-        if (x, y) in self.snake:
-          out = 1
-        elif (x, y) == self.fruit:
-          out = 2
-        result.append(out)
+    head = self.snake[0]
+    result = [0, 0, 0, 0, 0, 0]
+
+    # check forward, left, right
+    possible_dirs = [
+      DIRECTIONS[self.direction], # straight forward
+      DIRECTIONS[(self.direction + 3) % 4], # left
+      DIRECTIONS[(self.direction + 1) % 4] # right
+    ]
+
+    for i, p_dir in enumerate(possible_dirs):
+      guess_head = head + p_dir
+
+      # no obstacles
+      if (
+        0 <= guess_head[0] < SCREEN_SIZE and
+        0 <= guess_head[1] < SCREEN_SIZE and
+        guess_head.tolist() not in self.snake.tolist()
+      ):
+        result[i] = 1
+
+    # finding fruit
+    # heading straight forward to fruit
+    if np.any(head == self.fruit) and np.sum(head * possible_dirs[0]) < np.sum(self.fruit * possible_dirs[0]):
+      result[3] = 1
+    # fruit is on the left side
+    if np.sum(head * possible_dirs[1]) < np.sum(self.fruit * possible_dirs[1]):
+      result[4] = 1
+    # fruit is on the right side
+    if np.sum(head * possible_dirs[2]) < np.sum(self.fruit * possible_dirs[2]):
+      result[5] = 1
 
     return result
 
   def run(self):
-    direction = 0 # UP
     prev_key = pygame.K_UP
 
     font = pygame.font.Font('/Users/brad/Library/Fonts/3270Medium.otf', 20)
@@ -89,8 +114,8 @@ class Snake():
     clock = pygame.time.Clock()
 
     while True:
-      # os.system('clear')
-      # print(self.get_inputs())
+      if self.fitness < -20:
+        break
 
       clock.tick(10)
       for e in pygame.event.get():
@@ -111,21 +136,35 @@ class Snake():
                 elif ee.type == pygame.KEYDOWN:
                   if ee.key == pygame.K_SPACE:
                     pause = False
-          # CONTROLLER
-          if prev_key != pygame.K_DOWN and e.key == pygame.K_UP:
-            direction = 0
-            prev_key = e.key
-          elif prev_key != pygame.K_LEFT and e.key == pygame.K_RIGHT:
-            direction = 1
-            prev_key = e.key
-          elif prev_key != pygame.K_UP and e.key == pygame.K_DOWN:
-            direction = 2
-            prev_key = e.key
-          elif prev_key != pygame.K_RIGHT and e.key == pygame.K_LEFT:
-            direction = 3
-            prev_key = e.key
+          if __name__ == '__main__':
+            # CONTROLLER
+            if prev_key != pygame.K_DOWN and e.key == pygame.K_UP:
+              self.direction = 0
+              prev_key = e.key
+            elif prev_key != pygame.K_LEFT and e.key == pygame.K_RIGHT:
+              self.direction = 1
+              prev_key = e.key
+            elif prev_key != pygame.K_UP and e.key == pygame.K_DOWN:
+              self.direction = 2
+              prev_key = e.key
+            elif prev_key != pygame.K_RIGHT and e.key == pygame.K_LEFT:
+              self.direction = 3
+              prev_key = e.key
+      
+      # action
+      if __name__ != '__main__':
+        inputs = self.get_inputs()
+        outputs = self.genome.forward(inputs)
+        outputs = np.argmax(outputs)
 
-      if not self.step(direction):
+        if outputs == 0: # straight
+          pass
+        elif outputs == 1: # left
+          self.direction = (self.direction + 3) % 4
+        elif outputs == 2: # right
+          self.direction = (self.direction + 1) % 4
+
+      if not self.step(self.direction):
         break
 
       # compute fitness
@@ -137,14 +176,18 @@ class Snake():
       self.last_dist = current_dist
 
       self.s.fill((0, 0, 0))
+      pygame.draw.rect(self.s, (255,255,255), [0,0,SCREEN_SIZE*PIXEL_SIZE,LINE_WIDTH])
+      pygame.draw.rect(self.s, (255,255,255), [0,SCREEN_SIZE*PIXEL_SIZE-LINE_WIDTH,SCREEN_SIZE*PIXEL_SIZE,LINE_WIDTH])
+      pygame.draw.rect(self.s, (255,255,255), [0,0,LINE_WIDTH,SCREEN_SIZE*PIXEL_SIZE])
+      pygame.draw.rect(self.s, (255,255,255), [SCREEN_SIZE*PIXEL_SIZE-LINE_WIDTH,0,LINE_WIDTH,SCREEN_SIZE*PIXEL_SIZE+LINE_WIDTH])
       for bit in self.snake:
-        self.s.blit(img, (bit[0] * PIXEL_SIZE, (SCREEN_SIZE - bit[1] - 1) * PIXEL_SIZE))
-      self.s.blit(appleimage, (self.fruit[0] * PIXEL_SIZE, (SCREEN_SIZE - self.fruit[1]-1) * PIXEL_SIZE))
+        self.s.blit(img, (bit[0] * PIXEL_SIZE, bit[1] * PIXEL_SIZE))
+      self.s.blit(appleimage, (self.fruit[0] * PIXEL_SIZE, self.fruit[1] * PIXEL_SIZE))
       score_ts = font.render(str(self.score), False, (255, 255, 255))
       self.s.blit(score_ts, (5, 5))
       pygame.display.update()
 
-    return self.score
+    return self.fitness, self.score
 
 if __name__ == '__main__':
   pygame.init()
@@ -153,7 +196,7 @@ if __name__ == '__main__':
   pygame.display.set_caption('Snake')
 
   while True:
-    snake = Snake(s)
-    score = snake.run()
+    snake = Snake(s, genome=None)
+    fitness, score = snake.run()
 
-    print('Best Score: %s' % score)
+    print('Fitness: %s, Score: %s' % (fitness, score))
