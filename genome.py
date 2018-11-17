@@ -16,7 +16,7 @@ class Genome():
     return net
 
   def relu(self, x):
-    return x * (x >= 0) * (x <= 1)
+    return x * (x >= 0)
 
   def softmax(self, x):
     return np.exp(x) / np.sum(np.exp(x), axis=0)

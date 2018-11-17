@@ -3,7 +3,7 @@ import os, random
 import numpy as np
 
 SCREEN_SIZE = 30
-PIXEL_SIZE = 10
+PIXEL_SIZE = 20
 LINE_WIDTH = 1
 
 DIRECTIONS = np.array([
@@ -21,9 +21,11 @@ class Snake():
 
     self.s = s
     self.score = 0
-    self.snake = np.array([(15, 27), (15, 28), (15, 29)])
+    self.snake = np.array([(15, 26), (15, 27), (15, 28), (15, 29)])
     self.direction = 0 # UP
     self.place_fruit()
+    self.timer = 0
+    self.last_fruit_time = 0
 
     # fitness
     self.fitness = 0.
@@ -57,6 +59,7 @@ class Snake():
     
     # eat fruit
     if all(new_head == self.fruit):
+      self.last_fruit_time = self.timer
       self.score += 1
       self.fitness += 10
       self.place_fruit()
@@ -114,10 +117,12 @@ class Snake():
     clock = pygame.time.Clock()
 
     while True:
-      if self.fitness < -20:
+      self.timer += 0.1
+      if self.fitness < -30 or self.timer - self.last_fruit_time > 0.1 * 60 * 10:
+        print('Terminate!')
         break
 
-      clock.tick(10)
+      clock.tick(60)
       for e in pygame.event.get():
         if e.type == pygame.QUIT:
           pygame.quit()
