@@ -2,6 +2,7 @@ import pygame
 import os, random
 
 SCREEN_SIZE = 30
+PIXEL_SIZE = 10
 
 DIRECTIONS = [
   (0, 1), # UP
@@ -74,9 +75,9 @@ class Snake():
 
     font = pygame.font.Font('/Users/brad/Library/Fonts/3270Medium.otf', 20)
     font.set_bold(True)
-    appleimage = pygame.Surface((10, 10))
+    appleimage = pygame.Surface((PIXEL_SIZE, PIXEL_SIZE))
     appleimage.fill((0, 255, 0))
-    img = pygame.Surface((10, 10))
+    img = pygame.Surface((PIXEL_SIZE, PIXEL_SIZE))
     img.fill((255, 0, 0))
     clock = pygame.time.Clock()
 
@@ -122,8 +123,8 @@ class Snake():
 
       self.s.fill((0, 0, 0))
       for bit in self.snake:
-        self.s.blit(img, (bit[0] * 10, (SCREEN_SIZE - bit[1] - 1) * 10))
-      self.s.blit(appleimage, (self.fruit[0] * 10, (SCREEN_SIZE - self.fruit[1]-1) * 10))
+        self.s.blit(img, (bit[0] * PIXEL_SIZE, (SCREEN_SIZE - bit[1] - 1) * PIXEL_SIZE))
+      self.s.blit(appleimage, (self.fruit[0] * PIXEL_SIZE, (SCREEN_SIZE - self.fruit[1]-1) * PIXEL_SIZE))
       score_ts = font.render(str(self.score), False, (255, 255, 255))
       self.s.blit(score_ts, (5, 5))
       pygame.display.update()
@@ -133,7 +134,7 @@ class Snake():
 if __name__ == '__main__':
   pygame.init()
   pygame.font.init()
-  s = pygame.display.set_mode((SCREEN_SIZE * 10, SCREEN_SIZE * 10))
+  s = pygame.display.set_mode((SCREEN_SIZE * PIXEL_SIZE, SCREEN_SIZE * PIXEL_SIZE))
   pygame.display.set_caption('Snake')
 
   while True:
