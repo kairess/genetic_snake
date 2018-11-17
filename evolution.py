@@ -7,7 +7,7 @@ from genome import Genome
 N_POPULATION = 50
 N_BEST = 2
 N_CHILDREN = 3
-PROB_MUTATION = 0.2
+PROB_MUTATION = 0.4
 
 pygame.init()
 pygame.font.init()
@@ -39,18 +39,20 @@ while True:
   # crossover
   for i in range(N_CHILDREN):
     new_genome = deepcopy(best_genomes[0])
-    a_genome = best_genomes[0]
-    b_genome = best_genomes[1]
-
     if random.uniform(0, 1) < 0.5:
-      new_genome.w1[i] = a_genome.w1[i]
+      a_genome = best_genomes[0]
+      b_genome = best_genomes[1]
     else:
-      new_genome.w1[i] = b_genome.w1[i]
+      a_genome = best_genomes[1]
+      b_genome = best_genomes[0]
 
-    if random.uniform(0, 1) < 0.5:
-      new_genome.w2[i] = a_genome.w2[i]
-    else:
-      new_genome.w2[i] = b_genome.w2[i]
+    cut = random.randint(0, new_genome.w1.shape[1])
+    new_genome.w1[i, :cut] = a_genome.w1[i, :cut]
+    new_genome.w1[i, cut:] = b_genome.w1[i, cut:]
+
+    cut = random.randint(0, new_genome.w2.shape[1])
+    new_genome.w2[i, :cut] = a_genome.w2[i, :cut]
+    new_genome.w2[i, cut:] = b_genome.w2[i, cut:]
 
     best_genomes.append(new_genome)
 

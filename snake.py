@@ -56,8 +56,7 @@ class Snake():
         new_head[1] >= SCREEN_SIZE or
         new_head.tolist() in self.snake.tolist()
       ):
-      if new_head.tolist() in self.snake.tolist():
-        self.fitness -= FPS/2
+      # self.fitness -= FPS/2
       return False
     
     # eat fruit
@@ -75,7 +74,7 @@ class Snake():
 
   def get_inputs(self):
     head = self.snake[0]
-    result = [0, 0, 0, 0, 0, 0]
+    result = [1., 1., 1., 0., 0., 0.]
 
     # check forward, left, right
     possible_dirs = [
@@ -84,16 +83,21 @@ class Snake():
       DIRECTIONS[(self.direction + 1) % 4] # right
     ]
 
+    # 0 - 1 ... danger - safe
     for i, p_dir in enumerate(possible_dirs):
-      guess_head = head + p_dir
+      # sensor range = 5
+      for j in range(5):
+        guess_head = head + p_dir * (j + 1)
 
-      # no obstacles
-      if (
-        0 <= guess_head[0] < SCREEN_SIZE and
-        0 <= guess_head[1] < SCREEN_SIZE and
-        guess_head.tolist() not in self.snake.tolist()
-      ):
-        result[i] = 1
+        if (
+          guess_head[0] < 0 or
+          guess_head[0] >= SCREEN_SIZE or
+          guess_head[1] < 0 or
+          guess_head[1] >= SCREEN_SIZE or
+          guess_head.tolist() in self.snake.tolist()
+        ):
+          result[i] = j * 0.2
+          break
 
     # finding fruit
     # heading straight forward to fruit
@@ -107,9 +111,11 @@ class Snake():
     else:
       result[5] = 1
 
-    return result
+    return np.array(result)
 
   def run(self):
+    self.fitness = 0
+
     prev_key = pygame.K_UP
 
     font = pygame.font.Font('/Users/brad/Library/Fonts/3270Medium.otf', 20)
@@ -123,6 +129,7 @@ class Snake():
     while True:
       self.timer += 0.1
       if self.fitness < -FPS/2 or self.timer - self.last_fruit_time > 0.1 * FPS * 5:
+        # self.fitness -= FPS/2
         print('Terminate!')
         break
 

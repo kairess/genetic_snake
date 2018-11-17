@@ -20,3 +20,6 @@ class Genome():
 
   def softmax(self, x):
     return np.exp(x) / np.sum(np.exp(x), axis=0)
+
+  def leaky_relu(self, x):
+    return np.where(x > 0, x, x * 0.01)
