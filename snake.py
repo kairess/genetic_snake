@@ -89,6 +89,21 @@ class Snake():
         if e.type == pygame.QUIT:
           pygame.quit()
         elif e.type == pygame.KEYDOWN:
+          # QUIT
+          if e.key == pygame.K_ESCAPE:
+            pygame.quit()
+            exit()
+          # PAUSE
+          if e.key == pygame.K_SPACE:
+            pause = True
+            while pause:
+              for ee in pygame.event.get():
+                if ee.type == pygame.QUIT:
+                  pygame.quit()
+                elif ee.type == pygame.KEYDOWN:
+                  if ee.key == pygame.K_SPACE:
+                    pause = False
+          # CONTROLLER
           if prev_key != pygame.K_DOWN and e.key == pygame.K_UP:
             direction = 0
             prev_key = e.key
