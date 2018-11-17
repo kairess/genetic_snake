@@ -5,8 +5,8 @@ from snake import Snake, SCREEN_SIZE, PIXEL_SIZE
 from genome import Genome
 
 N_POPULATION = 50
-N_BEST = 2
-N_CHILDREN = 3
+N_BEST = 5
+N_CHILDREN = 5
 PROB_MUTATION = 0.4
 
 pygame.init()
@@ -28,23 +28,22 @@ while True:
 
     genome.fitness = fitness
 
-    print('Generation #%s, Genome #%s, Fitness: %s, Score: %s' % (n_gen, i, fitness, score))
+    # print('Generation #%s, Genome #%s, Fitness: %s, Score: %s' % (n_gen, i, fitness, score))
 
   if best_genomes is not None:
     genomes.extend(best_genomes)
   genomes.sort(key=lambda x: x.fitness, reverse=True)
+
+  print('===== Generaton #%s\tBest Fitness %s =====' % (n_gen, genomes[0].fitness))
+  print(genomes[0].w1, genomes[0].w2)
 
   best_genomes = deepcopy(genomes[:N_BEST])
 
   # crossover
   for i in range(N_CHILDREN):
     new_genome = deepcopy(best_genomes[0])
-    if random.uniform(0, 1) < 0.5:
-      a_genome = best_genomes[0]
-      b_genome = best_genomes[1]
-    else:
-      a_genome = best_genomes[1]
-      b_genome = best_genomes[0]
+    a_genome = random.choice(best_genomes)
+    b_genome = random.choice(best_genomes)
 
     cut = random.randint(0, new_genome.w1.shape[1])
     new_genome.w1[i, :cut] = a_genome.w1[i, :cut]
@@ -58,13 +57,13 @@ while True:
 
   # mutation
   genomes = []
-  for i in range(N_POPULATION // (N_BEST + N_BEST // 2 * N_CHILDREN)):
+  for i in range(int(N_POPULATION / (N_BEST + N_CHILDREN))):
     for bg in best_genomes:
       new_genome = deepcopy(bg)
 
       if random.uniform(0, 1) < PROB_MUTATION:
-        new_genome.w1 += new_genome.w1 * np.random.normal(15, 4, size=(6, 10)) / 100 * np.random.randint(-1, 2, (6, 10))
+        new_genome.w1 += new_genome.w1 * np.random.normal(10, 10, size=(6, 10)) / 100 * np.random.randint(-1, 2, (6, 10))
       if random.uniform(0, 1) < PROB_MUTATION:
-        new_genome.w2 += new_genome.w2 * np.random.normal(15, 4, size=(10, 3)) / 100 * np.random.randint(-1, 2, (10, 3))
+        new_genome.w2 += new_genome.w2 * np.random.normal(10, 10, size=(10, 3)) / 100 * np.random.randint(-1, 2, (10, 3))
 
       genomes.append(new_genome)
