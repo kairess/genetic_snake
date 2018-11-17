@@ -2,6 +2,7 @@ import pygame
 import os, random
 import numpy as np
 
+FPS = 60
 SCREEN_SIZE = 30
 PIXEL_SIZE = 20
 LINE_WIDTH = 1
@@ -21,7 +22,7 @@ class Snake():
 
     self.s = s
     self.score = 0
-    self.snake = np.array([(15, 26), (15, 27), (15, 28), (15, 29)])
+    self.snake = np.array([[15, 26], [15, 27], [15, 28], [15, 29]])
     self.direction = 0 # UP
     self.place_fruit()
     self.timer = 0
@@ -39,7 +40,7 @@ class Snake():
     while True:
       x = random.randint(0, SCREEN_SIZE-1)
       y = random.randint(0, SCREEN_SIZE-1)
-      if (x, y) not in self.snake.tolist():
+      if list([x, y]) not in self.snake.tolist():
         break
     self.fruit = np.array([x, y])
 
@@ -55,6 +56,8 @@ class Snake():
         new_head[1] >= SCREEN_SIZE or
         new_head.tolist() in self.snake.tolist()
       ):
+      if new_head.tolist() in self.snake.tolist():
+        self.fitness -= FPS/2
       return False
     
     # eat fruit
@@ -94,13 +97,14 @@ class Snake():
 
     # finding fruit
     # heading straight forward to fruit
-    if np.any(head == self.fruit) and np.sum(head * possible_dirs[0]) < np.sum(self.fruit * possible_dirs[0]):
+    if np.any(head == self.fruit) and np.sum(head * possible_dirs[0]) <= np.sum(self.fruit * possible_dirs[0]):
       result[3] = 1
     # fruit is on the left side
     if np.sum(head * possible_dirs[1]) < np.sum(self.fruit * possible_dirs[1]):
       result[4] = 1
     # fruit is on the right side
-    if np.sum(head * possible_dirs[2]) < np.sum(self.fruit * possible_dirs[2]):
+    # if np.sum(head * possible_dirs[2]) < np.sum(self.fruit * possible_dirs[2]):
+    else:
       result[5] = 1
 
     return result
@@ -118,11 +122,11 @@ class Snake():
 
     while True:
       self.timer += 0.1
-      if self.fitness < -30 or self.timer - self.last_fruit_time > 0.1 * 60 * 10:
+      if self.fitness < -FPS/2 or self.timer - self.last_fruit_time > 0.1 * FPS * 5:
         print('Terminate!')
         break
 
-      clock.tick(60)
+      clock.tick(FPS)
       for e in pygame.event.get():
         if e.type == pygame.QUIT:
           pygame.quit()
