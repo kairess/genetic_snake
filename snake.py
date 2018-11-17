@@ -54,20 +54,18 @@ class Snake():
     self.snake.insert(0, new_head)
     return True
 
-  def print_field(self):
-    os.system('clear')
-    print('=' * (SCREEN_SIZE+2))
+  def get_inputs(self):
+    result = []
     for y in range(SCREEN_SIZE-1, -1, -1):
-      print('|', end='')
       for x in range(SCREEN_SIZE):
-        out = ' '
+        out = 0
         if (x, y) in self.snake:
-          out = 'X'
+          out = 1
         elif (x, y) == self.fruit:
-          out = 'O'
-        print(out, end='')
-      print('|')
-    print('=' * (SCREEN_SIZE+2))
+          out = 2
+        result.append(out)
+
+    return result
 
   def run(self):
     direction = 0 # UP
@@ -83,6 +81,9 @@ class Snake():
     clock = pygame.time.Clock()
 
     while True:
+      # os.system('clear')
+      # print(self.get_inputs())
+
       clock.tick(10)
       for e in pygame.event.get():
         if e.type == pygame.QUIT:
