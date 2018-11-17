@@ -72,6 +72,10 @@ class Snake():
     prev_key = pygame.K_UP
 
     pygame.init()
+    pygame.font.init()
+    print(pygame.font.get_fonts())
+    font = pygame.font.Font('/Users/brad/Library/Fonts/3270Medium.otf', 20)
+    font.set_bold(True)
     s = pygame.display.set_mode((SCREEN_SIZE * 10, SCREEN_SIZE * 10))
     pygame.display.set_caption('Snake')
     appleimage = pygame.Surface((10, 10))
@@ -121,10 +125,12 @@ class Snake():
         pygame.quit()
         return self.score
 
-      s.fill((255, 255, 255))	
+      s.fill((0, 0, 0))
       for bit in self.snake:
         s.blit(img, (bit[0] * 10, (SCREEN_SIZE - bit[1] - 1) * 10))
       s.blit(appleimage, (self.fruit[0] * 10, (SCREEN_SIZE - self.fruit[1]-1) * 10))
+      score_ts = font.render(str(self.score), False, (255, 255, 255))
+      s.blit(score_ts, (5, 5))
       pygame.display.update()
 
 while True:
