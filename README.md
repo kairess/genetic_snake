@@ -1,0 +1,10 @@
+# Evolutionary Snake
+
+![https://youtu.be/C4WH5b-EidU](https://github.com/kairess/genetic_snake/raw/master/result.png)
+
+## Dependencies
+- Python 3+
+- numpy
+- pygame
+
+Snake game code by HonzaKral: https://gist.github.com/HonzaKral/833ee2b30231c53ec78e
