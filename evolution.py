@@ -53,6 +53,14 @@ while True:
     new_genome.w2[i, :cut] = a_genome.w2[i, :cut]
     new_genome.w2[i, cut:] = b_genome.w2[i, cut:]
 
+    cut = random.randint(0, new_genome.w3.shape[1])
+    new_genome.w3[i, :cut] = a_genome.w3[i, :cut]
+    new_genome.w3[i, cut:] = b_genome.w3[i, cut:]
+
+    cut = random.randint(0, new_genome.w4.shape[1])
+    new_genome.w4[i, :cut] = a_genome.w4[i, :cut]
+    new_genome.w4[i, cut:] = b_genome.w4[i, cut:]
+
     best_genomes.append(new_genome)
 
   # mutation
@@ -61,9 +69,16 @@ while True:
     for bg in best_genomes:
       new_genome = deepcopy(bg)
 
+      mean = 20
+      stddev = 10
+
       if random.uniform(0, 1) < PROB_MUTATION:
-        new_genome.w1 += new_genome.w1 * np.random.normal(10, 10, size=(6, 10)) / 100 * np.random.randint(-1, 2, (6, 10))
+        new_genome.w1 += new_genome.w1 * np.random.normal(mean, stddev, size=(6, 10)) / 100 * np.random.randint(-1, 2, (6, 10))
       if random.uniform(0, 1) < PROB_MUTATION:
-        new_genome.w2 += new_genome.w2 * np.random.normal(10, 10, size=(10, 3)) / 100 * np.random.randint(-1, 2, (10, 3))
+        new_genome.w2 += new_genome.w2 * np.random.normal(mean, stddev, size=(10, 20)) / 100 * np.random.randint(-1, 2, (10, 20))
+      if random.uniform(0, 1) < PROB_MUTATION:
+        new_genome.w3 += new_genome.w3 * np.random.normal(mean, stddev, size=(20, 10)) / 100 * np.random.randint(-1, 2, (20, 10))
+      if random.uniform(0, 1) < PROB_MUTATION:
+        new_genome.w4 += new_genome.w4 * np.random.normal(mean, stddev, size=(10, 3)) / 100 * np.random.randint(-1, 2, (10, 3))
 
       genomes.append(new_genome)
