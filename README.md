@@ -1,6 +1,11 @@
 # Evolutionary Snake
 
-![https://youtu.be/C4WH5b-EidU](https://github.com/kairess/genetic_snake/raw/master/result.png)
+[![https://youtu.be/C4WH5b-EidU](https://github.com/kairess/genetic_snake/raw/master/result.png)](https://youtu.be/C4WH5b-EidU)
+
+## Run
+```
+python evolution.py
+```
 
 ## Dependencies
 - Python 3+
