@@ -118,7 +118,7 @@ class Snake():
 
     prev_key = pygame.K_UP
 
-    font = pygame.font.Font('/Users/brad/Library/Fonts/3270Medium.otf', 20)
+    font = pygame.font.Font('3270Medium.otf', 20)
     font.set_bold(True)
     appleimage = pygame.Surface((PIXEL_SIZE, PIXEL_SIZE))
     appleimage.fill((0, 255, 0))
